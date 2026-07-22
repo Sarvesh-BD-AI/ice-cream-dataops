@@ -23,6 +23,9 @@ jobs:
   build-modules:
     name: Build & Deploy
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ice-cream-dataops
     container:
       image: cognite/toolkit:0.6.53
     strategy:
