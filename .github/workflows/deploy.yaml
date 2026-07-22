@@ -1,14 +1,10 @@
 name: Deploy Toolkit
-
 on:
   push:
     branches:
       - main
     paths:
-      - ice-cream-dataops/**
-      - .github/workflows/deploy.yaml
-      - config.prod.yaml
-      - config.test.yaml
+      - ice-cream-dataops/**  # Make sure this matches default_organization_dir in cdf.toml
   workflow_dispatch:
     inputs:
       environment:
@@ -18,62 +14,49 @@ on:
         options:
           - test
           - prod
-
+ 
 jobs:
   build-modules:
     name: Build & Deploy
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ice-cream-dataops
     container:
-      image: cognite/toolkit:0.6.53
+      image: cognite/toolkit:0.6.53  # Make sure the toolkit version matches the version in cdf.toml
     strategy:
       matrix:
         include:
+          # Deploy to 'test' environment automatically, only on push to main branch
           - environment: ${{ inputs.environment != '' && inputs.environment || 'test' }}
-
+ 
     environment: ${{ matrix.environment }}
     env:
-      # Replace the project number (58) if different for your organization.
-      # ADD: If your project number is different, edit the '58' here.
+      # Cognite Toolkit environment variables
       CDF_PROJECT: cdf-bootcamp-58-${{ matrix.environment }}
-
-      # Cloud/IDP settings (verify these values for your tenant)
+ 
       CDF_CLUSTER: westeurope-1
       IDP_TENANT_ID: 16e3985b-ebe8-4e24-9da4-933e21a9fc81
       IDP_TOKEN_URL: https://login.microsoftonline.com/16e3985b-ebe8-4e24-9da4-933e21a9fc81/oauth2/v2.0/token
       LOGIN_FLOW: client_credentials
-
-      # IDP client id (non-secret) - inlined from .env
-      IDP_CLIENT_ID: 12685a0b-fcff-4a42-90c4-0a4de8195a83
-      IDP_CLIENT_SECRET: vxQ8Q~csWf_MSqMPoJ26XbCtqkWCfzOVsUfrjdw.
-
-      # ADD: Set the Source IDs and client IDs/secrets as GitHub Variables/Secrets below.
-      # Source IDs (inlined from .env)
-      DATA_DEVELOPER_SOURCE_ID: 4616309c-3ec0-48ec-afd2-b8767250d03f
-
-      # Data pipeline OEE extractor credentials
-      # Data pipeline OEE extractor credentials (client IDs and source IDs inlined; secrets must be set in GitHub Secrets)
-      DATA_PIPELINE_OEE_CLIENT_ID: e071ca43-400c-40c4-8032-d7747c9164e7
-      DATA_PIPELINE_OEE_CLIENT_SECRET: dT48Q~iZDPF1SnyTr4t~ZYRGz7Z~1Q-3~RX1dbi-
-      DATA_PIPELINE_OEE_SOURCE_ID: c90ff008-00a5-4bc0-b028-ca7fc2eb80a3
-
-      # IC API extractors credentials
-      # IC API extractors credentials (client IDs and source IDs inlined; secrets must be set in GitHub Secrets)
-      ICAPI_EXTRACTORS_CLIENT_ID: aab18c34-e325-410e-9f63-bbf8edb5beda
-      ICAPI_EXTRACTORS_CLIENT_SECRET: P6M8Q~LHv5sQ~ir3IlVPoKIRIl.EgbKUg66ZCbqr
-      ICAPI_EXTRACTORS_SOURCE_ID: 64177f81-1fcf-43c9-a1f8-df0b56181212
-
+ 
+      IDP_CLIENT_ID: ${{ vars.IDP_CLIENT_ID }}
+      IDP_CLIENT_SECRET: ${{ secrets.IDP_CLIENT_SECRET }}
+ 
+      # This project's environment variables
+      DATA_DEVELOPER_SOURCE_ID: ${{ vars.DATA_DEVELOPER_SOURCE_ID }}
+ 
+      DATA_PIPELINE_OEE_CLIENT_ID: ${{ vars.DATA_PIPELINE_OEE_CLIENT_ID }}
+      DATA_PIPELINE_OEE_CLIENT_SECRET: ${{ secrets.DATA_PIPELINE_OEE_CLIENT_SECRET }}
+      DATA_PIPELINE_OEE_SOURCE_ID: ${{ vars.DATA_PIPELINE_OEE_SOURCE_ID }}
+ 
+      ICAPI_EXTRACTORS_CLIENT_ID: ${{ vars.ICAPI_EXTRACTORS_CLIENT_ID }}
+      ICAPI_EXTRACTORS_CLIENT_SECRET: ${{ secrets.ICAPI_EXTRACTORS_CLIENT_SECRET }}
+      ICAPI_EXTRACTORS_SOURCE_ID: ${{ vars.ICAPI_EXTRACTORS_SOURCE_ID }}
+ 
     steps:
       - uses: actions/checkout@v4
-      - name: Remove local .env
-        run: rm -f .env
-      - name: Note CI trigger
-        run: echo "Triggering new workflow run"
       - name: Verify and Update Toolkit Authorization
         run: yes | cdf auth verify
       - name: Build Toolkit Configurations
         run: cdf build --env=${{ matrix.environment }}
       - name: Deploy Toolkit Configurations
         run: cdf deploy --env=${{ matrix.environment }}
+ 
