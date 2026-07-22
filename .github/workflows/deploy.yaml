@@ -61,6 +61,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Remove local .env
+        run: rm -f .env
       - name: Verify and Update Toolkit Authorization
         run: yes | cdf auth verify
       - name: Build Toolkit Configurations
