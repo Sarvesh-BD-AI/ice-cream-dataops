@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - ice-cream-dataops/**
+      - .github/workflows/deploy.yaml
+      - config.prod.yaml
+      - config.test.yaml
   workflow_dispatch:
     inputs:
       environment:
@@ -63,6 +66,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Remove local .env
         run: rm -f .env
+      - name: Note CI trigger
+        run: echo "Triggering new workflow run"
       - name: Verify and Update Toolkit Authorization
         run: yes | cdf auth verify
       - name: Build Toolkit Configurations
