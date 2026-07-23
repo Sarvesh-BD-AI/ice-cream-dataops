@@ -1,5 +1,5 @@
 name: icapi_extractors
-sourceId: 64177f81-1fcf-43c9-a1f8-df0b56181212  #  {{icapi_extractors_source_id}} 
+sourceId: {{icapi_extractors_source_id}} 
 capabilities:
   - datasetsAcl:
       actions: [READ]

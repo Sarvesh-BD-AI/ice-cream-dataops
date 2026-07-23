@@ -1,5 +1,5 @@
 name: data_developer
-sourceId: 4616309c-3ec0-48ec-afd2-b8767250d03f   #  {{ data_developer_source_id }}
+sourceId: {{ data_developer_source_id }}
 capabilities:
   - dataModelInstancesAcl:
       actions: [READ, WRITE]
