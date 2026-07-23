@@ -5,5 +5,5 @@ triggerRule:
 workflowExternalId: wf_icapi_data_pipeline
 workflowVersion: '1'
 authentication:
-  clientId: ${ICAPI_EXTRACTORS_CLIENT_ID}
-  clientSecret: ${ICAPI_EXTRACTORS_CLIENT_SECRET}
+  clientId: {{ icapi_trigger_client_id }}
+  clientSecret: {{ icapi_trigger_client_secret }}
