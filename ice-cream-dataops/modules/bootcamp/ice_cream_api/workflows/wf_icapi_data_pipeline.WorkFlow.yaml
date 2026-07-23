@@ -1,2 +1,3 @@
 externalId: wf_icapi_data_pipeline
-description: Orchestrates the Ice Cream API data pipeline from extraction to processing.
+description: A workflow for processing data
+dataSetExternalId: {{ icapi_ds_external_id }}
