@@ -104,6 +104,12 @@ def process_site(client, lookback_minutes, site):
     source_space = "icapi_dm_space"
 
     timeseries = get_time_series_for_site(client, site, source_space)
+
+    # Skip sites with no time series
+    if not timeseries:
+        print(f"Skipping {site}: no time series found.")
+        return
+
     asset_eids = list(set([item.external_id.split(sep=":")[0] for item in timeseries]))
     instance_ids = [NodeId(space=source_space, external_id=ts.external_id) for ts in timeseries]
     all_latest_dps = client.time_series.data.retrieve_latest(instance_id=instance_ids)
